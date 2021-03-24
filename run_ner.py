@@ -163,10 +163,6 @@ def main():
     num_labels = len(label_list)
 
 
-    # Shuffle dataset
-    datasets = datasets.shuffle(seed=training_args.seed)
-
-
     # Load model
     config = AutoConfig.from_pretrained(
         model_args.model_name_or_path,
@@ -271,23 +267,13 @@ def main():
         ]
 
         results = metric.compute(predictions=true_predictions, references=true_labels)
-        if data_args.return_entity_level_metrics:
-            # Unpack nested dictionaries
-            final_results = {}
-            for key, value in results.items():
-                if isinstance(value, dict):
-                    for n, v in value.items():
-                        final_results[f"{key}_{n}"] = v
-                else:
-                    final_results[key] = value
-            return final_results
-        else:
-            return {
-                "precision": results["overall_precision"],
-                "recall": results["overall_recall"],
-                "f1": results["overall_f1"],
-                "accuracy": results["overall_accuracy"],
-            }
+
+        return {
+            "precision": results["overall_precision"],
+            "recall": results["overall_recall"],
+            "f1": results["overall_f1"],
+            "accuracy": results["overall_accuracy"],
+        }
 
 
     trainer = Trainer(
